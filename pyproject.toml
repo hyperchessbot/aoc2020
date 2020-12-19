@@ -6,6 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9.0"
+regex = "^2020.11.13"
 
 [tool.poetry.dev-dependencies]
 
