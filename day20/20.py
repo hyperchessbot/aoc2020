@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from functools import reduce
 from itertools import product, permutations, chain
 from typing import NamedTuple, List, Tuple, Set
+import numpy as np
 
 
 class Borders(NamedTuple):
@@ -25,7 +26,6 @@ class Tile:
     orig_east: str
     orig_south: str
     orig_west: str
-    perms: Tuple[Borders]
 
     def __init__(self, data):
         data = data.strip().split('\n')
@@ -34,20 +34,10 @@ class Tile:
         self.orig_south = data[-1]
         self.orig_east = ''.join([x[-1] for x in data])
         self.orig_west = ''.join([x[0] for x in data])
-        self.perms_build = [
-            Borders(self.orig_north, self.orig_east, self.orig_south, self.orig_west),
-            Borders(self.orig_west[::-1], self.orig_north, self.orig_east[::-1], self.orig_south),
-            Borders(self.orig_south[::-1], self.orig_west[::-1], self.orig_north[::-1], self.orig_east[::-1]),
-            Borders(self.orig_east, self.orig_south[::-1], self.orig_west, self.orig_north[::-1]),
-        ]
-        for border in list(self.perms_build):
-            self.perms_build.extend([
-                Borders(border.south, border.east[::-1], border.north, border.west[::-1]),
-                Borders(border.north[::-1], border.west, border.south[::-1], border.east),
-                Borders(border.south[::-1], border.west[::-1], border.north[::-1], border.east[::-1])
-            ])
-        self.perms = tuple(self.perms_build)
-        self.data = data
+        self.data = [x.replace('.', '0') for x in data]
+        self.data = [list(map(int, x.replace('#', '1'))) for x in self.data]
+        print(self.data)
+        self.array = np.array(self.data)
 
     @property
     def borders(self):
@@ -59,16 +49,13 @@ class Tile:
         }
 
 tiles = []
-with open('02.txt', 'r') as f:
+with open('01.txt', 'r') as f:
     raw_data = f.read()
     tiles_raw = raw_data.split('\n\n')
     for tile_raw in tiles_raw:
         tiles.append(Tile(tile_raw))
 
-size = math.sqrt(len(tiles))
-print(int(size))
-if size == 3:
-    state = [['', '', ''] for _ in range(3)]
+size = int(math.sqrt(len(tiles)))
 
 tile_map = {}
 for tile in tiles:
@@ -83,4 +70,8 @@ total = [k.id for k,v in  tile_map.items() if len(v) == 2]
 # for k, v in tile_map.items():
 #     print(k.id, [x.id for x in v])
 print('Part 1:', reduce(lambda a, b: a*b, total))
+
+map = []
+
+
 
